@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>5+2 kérdéses születésnapi kvíz</title>
+    <style>
+        body{font-size: 20px;font-family: sans-serif;color: #333;  }
+    .question{font-weight: 600;}
+    .opcije {margin-bottom: 20px;}
+    .opcije label{display: block;}
+    #submit{font-family: sans-serif;font-size: 20px;
+	background-color: green;
+	color: #fff;
+	border: 0px;
+	border-radius: 3px;
+	padding: 20px;
+	cursor: pointer;
+	margin-bottom: 20px;
+    }
+    #submit:hover{
+	    background-color: greenyellow;
+    }
+    </style>
+</head>
+<body>
+    <h3 style="color:green">Születésnapi kvíz</h3>
+    <div id="quiz"></div>
+    <button id="submit">Kvíz kiértékelése (1x lehetséges)</button>
+    <div id="results"></div>
+<script>
+    
+    (function(){
+  function sagradiKviz(){
+    const izlaz = [];
+    mojaPitanja.forEach(
+      (aktuelnoPitanje, redniBrojPitanja) => {
+
+        const opcije = [];
+
+        for(slovo in aktuelnoPitanje.opcije){
+
+          opcije.push(
+            `<label>
+              <input type="radio" name="question${redniBrojPitanja}" value="${slovo}">
+              ${slovo} :
+              ${aktuelnoPitanje.opcije[slovo]}
+            </label>`
+          );
+        }
+
+        izlaz.push(
+          `<div class="question"> ${aktuelnoPitanje.question} </div>
+          <div class="opcije"> ${opcije.join('')} </div>`
+        );
+      }
+    );
+
+    kvizContainer.innerHTML = izlaz.join('');
+  }
+
+  function prikaziRezultat(){
+	
+    const odgovorContainers = kvizContainer.querySelectorAll('.opcije');
+
+    let numtacan = 0;
+
+    mojaPitanja.forEach( (aktuelnoPitanje, redniBrojPitanja) => {
+
+      const odgovorContainer = odgovorContainers[redniBrojPitanja];
+      const selector = `input[name=question${redniBrojPitanja}]:checked`;
+      const userodgovor = (odgovorContainer.querySelector(selector) || {}).value;
+
+      if(userodgovor === aktuelnoPitanje.tacanodgovor){
+        numtacan++;
+
+        odgovorContainers[redniBrojPitanja].style.color = 'lightgreen';
+      }
+      else{
+        odgovorContainers[redniBrojPitanja].style.color = 'red';
+      }
+    });
+
+    resultsContainer.innerHTML = `<h3 style="color:green">Gratulálunk! ${numtacan} pontot értél el a lehetséges ${mojaPitanja.length} pontból.</h3>`;
+	
+	document.getElementById("submit").disabled = true;
+  }
+
+  const kvizContainer = document.getElementById('quiz');
+  const resultsContainer = document.getElementById('results');
+  const submitButton = document.getElementById('submit');
+  const mojaPitanja = [
+    {
+      question: "Mikor van „Budapest” születésnapja, azaz mikor egyesült Pest, Buda és Óbuda?",
+      opcije: {
+        a: "1873. szept. 17-én",
+        b: "1873. okt. 17-én",
+        c: "1873. nov. 17-én"
+      },
+      tacanodgovor: "c"
+    },
+    {
+      question: "A főváros legmagasabb pontja hány méterre van a tengerszint felett?",
+      opcije: {
+        a: "529",
+        b: "559",
+        c: "589"
+      },
+      tacanodgovor: "a"
+    },
+    {
+      question: "Ki volt Budapest első főpolgármestere?",
+      opcije: {
+        a: "Házmán Ferenc",
+        b: "Podmaniczky Frigyes",
+        c: "Ráth Károly"
+      },
+      tacanodgovor: "c"
+    },
+    {
+      question: "Hány kapuja van a Parlamentnek?",
+      opcije: {
+        a: "23",
+        b: "27",
+        c: "31"
+      },
+      tacanodgovor: "b"
+    },
+    {
+      question: "A Magyar Állami Operaház főbejárata mellett kinek áll szobra?",
+      opcije: {
+        a: "Bartók Béla",
+        b: "Liszt Ferenc",
+        c: "Kodály Zoltán"
+      },
+      tacanodgovor: "b"
+    },
+    {
+      question: "Idén a Hősök terén az 52. Eucharisztikus Kongresszus zárómiséjét Ferenc Pápa celebrálta. Mikor volt itt ezt megelőzően hasonló esemény (vagyis 34. Eucharisztikus Kongresszus)?",
+      opcije: {
+        a: "1931",
+        b: "1934",
+        c: "1938"
+      },
+      tacanodgovor: "c"
+    },
+    {
+      question: "A Budapest-szelet (avagy Sertésszelet Budapest módra) elkészítéséhez melyik hozzávalóra nincs szükség?",
+      opcije: {
+        a: "bab",
+        b: "gomba",
+        c: "zöldborsó"
+      },
+      tacanodgovor: "a"
+    }
+  ];
+
+  sagradiKviz();
+
+  submitButton.addEventListener('click', prikaziRezultat);
+})();
+</script>
+</body>
+</html>
