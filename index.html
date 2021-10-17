@@ -7,10 +7,10 @@
     <title>5+2 kérdéses születésnapi kvíz</title>
     <style>
         body{font-size: 20px;font-family: sans-serif;color: #333;  }
-    .question{font-weight: 600;}
+    .pitanje{font-weight: 600;}
     .opcije {margin-bottom: 20px;}
     .opcije label{display: block;}
-    #submit{font-family: sans-serif;font-size: 20px;
+    #prikaziRezultat{font-family: sans-serif;font-size: 20px;
 	background-color: green;
 	color: #fff;
 	border: 0px;
@@ -19,7 +19,7 @@
 	cursor: pointer;
 	margin-bottom: 20px;
     }
-    #submit:hover{
+    #prikaziRezultat:hover{
 	    background-color: greenyellow;
     }
     </style>
@@ -27,13 +27,22 @@
 <body>
     <h3 style="color:green">Születésnapi kvíz</h3>
     <div id="quiz"></div>
-    <button id="submit">Kvíz kiértékelése (1x lehetséges)</button>
+    <button id="prikaziRezultat">Kvíz kiértékelése (1x lehetséges)</button>
     <div id="results"></div>
 <script>
     
     (function(){
   function sagradiKviz(){
-    const izlaz = [];
+
+    if (localStorage.getItem("podaciSuSacuvani")=="y")
+      {
+        var sr = localStorage.getItem("rezultatSacuvani");
+        alert("Köszönjük, hogy már részt vett a kvíz játékban. Gratulálunk, hogy " + sr + " pontot ért el!");
+      } 
+        else
+
+      {
+        const izlaz = [];
     mojaPitanja.forEach(
       (aktuelnoPitanje, redniBrojPitanja) => {
 
@@ -43,7 +52,7 @@
 
           opcije.push(
             `<label>
-              <input type="radio" name="question${redniBrojPitanja}" value="${slovo}">
+              <input type="radio" name="pitanje${redniBrojPitanja}" value="${slovo}">
               ${slovo} :
               ${aktuelnoPitanje.opcije[slovo]}
             </label>`
@@ -51,48 +60,67 @@
         }
 
         izlaz.push(
-          `<div class="question"> ${aktuelnoPitanje.question} </div>
+          `<div class="pitanje"> ${aktuelnoPitanje.pitanje} </div>
           <div class="opcije"> ${opcije.join('')} </div>`
         );
       }
     );
 
     kvizContainer.innerHTML = izlaz.join('');
+      }  
+    
   }
 
   function prikaziRezultat(){
-	
-    const odgovorContainers = kvizContainer.querySelectorAll('.opcije');
 
-    let numtacan = 0;
 
-    mojaPitanja.forEach( (aktuelnoPitanje, redniBrojPitanja) => {
 
-      const odgovorContainer = odgovorContainers[redniBrojPitanja];
-      const selector = `input[name=question${redniBrojPitanja}]:checked`;
-      const userodgovor = (odgovorContainer.querySelector(selector) || {}).value;
+    if (localStorage.getItem("podaciSuSacuvani")=="y")
+      {
+        var sr = localStorage.getItem("rezultatSacuvani");
+        alert("Köszönjük, hogy már részt vett a kvíz játékban. Gratulálunk, hogy " + sr + " pontot ért el!");
+      } 
+        else
+      {
+        localStorage.setItem("podaciSuSacuvani","y");
 
-      if(userodgovor === aktuelnoPitanje.tacanodgovor){
-        numtacan++;
+        const odgovorContainers = kvizContainer.querySelectorAll('.opcije');
 
-        odgovorContainers[redniBrojPitanja].style.color = 'lightgreen';
+          let numtacan = 0;
+
+          mojaPitanja.forEach( (aktuelnoPitanje, redniBrojPitanja) => {
+
+            const odgovorContainer = odgovorContainers[redniBrojPitanja];
+            const selector = `input[name=pitanje${redniBrojPitanja}]:checked`;
+            const userodgovor = (odgovorContainer.querySelector(selector) || {}).value;
+
+            if(userodgovor === aktuelnoPitanje.tacanodgovor){
+              numtacan++;
+
+              odgovorContainers[redniBrojPitanja].style.color = 'lightgreen';
+            }
+            else{
+              odgovorContainers[redniBrojPitanja].style.color = 'red';
+            }
+          });
+
+          localStorage.setItem("rezultatSacuvani",numtacan);
+
+          resultsContainer.innerHTML = `<h3 style="color:green">Gratulálunk! ${numtacan} pontot értél el a lehetséges ${mojaPitanja.length} pontból.</h3>`;
+
+          document.getElementById("prikaziRezultat").disabled = true;
+
       }
-      else{
-        odgovorContainers[redniBrojPitanja].style.color = 'red';
-      }
-    });
-
-    resultsContainer.innerHTML = `<h3 style="color:green">Gratulálunk! ${numtacan} pontot értél el a lehetséges ${mojaPitanja.length} pontból.</h3>`;
 	
-	document.getElementById("submit").disabled = true;
+   
   }
 
   const kvizContainer = document.getElementById('quiz');
   const resultsContainer = document.getElementById('results');
-  const submitButton = document.getElementById('submit');
+  const prikaziRezultatButton = document.getElementById('prikaziRezultat');
   const mojaPitanja = [
     {
-      question: "1. Mikor van „Budapest” születésnapja, azaz mikor egyesült Pest, Buda és Óbuda?",
+      pitanje: "1. Mikor van „Budapest” születésnapja, azaz mikor egyesült Pest, Buda és Óbuda?",
       opcije: {
         a: "1873. szept. 17-én",
         b: "1873. okt. 17-én",
@@ -101,7 +129,7 @@
       tacanodgovor: "c"
     },
     {
-      question: "2. A főváros legmagasabb pontja hány méterre van a tengerszint felett?",
+      pitanje: "2. A főváros legmagasabb pontja hány méterre van a tengerszint felett?",
       opcije: {
         a: "529",
         b: "559",
@@ -110,7 +138,7 @@
       tacanodgovor: "a"
     },
     {
-      question: "3. Ki volt Budapest első főpolgármestere?",
+      pitanje: "3. Ki volt Budapest első főpolgármestere?",
       opcije: {
         a: "Házmán Ferenc",
         b: "Podmaniczky Frigyes",
@@ -119,7 +147,7 @@
       tacanodgovor: "c"
     },
     {
-      question: "4. Hány kapuja van a Parlamentnek?",
+      pitanje: "4. Hány kapuja van a Parlamentnek?",
       opcije: {
         a: "23",
         b: "27",
@@ -128,7 +156,7 @@
       tacanodgovor: "b"
     },
     {
-      question: "5. A Magyar Állami Operaház főbejárata mellett kinek áll szobra?",
+      pitanje: "5. A Magyar Állami Operaház főbejárata mellett kinek áll szobra?",
       opcije: {
         a: "Bartók Béla",
         b: "Liszt Ferenc",
@@ -137,7 +165,7 @@
       tacanodgovor: "b"
     },
     {
-      question: "5+1. Idén a Hősök terén az 52. Eucharisztikus Kongresszus zárómiséjét Ferenc Pápa celebrálta. Mikor volt itt ezt megelőzően hasonló esemény (vagyis a 34. Eucharisztikus Kongresszus)?",
+      pitanje: "5+1. Idén a Hősök terén az 52. Eucharisztikus Kongresszus zárómiséjét Ferenc Pápa celebrálta. Mikor volt itt ezt megelőzően hasonló esemény (vagyis a 34. Eucharisztikus Kongresszus)?",
       opcije: {
         a: "1931",
         b: "1934",
@@ -146,7 +174,7 @@
       tacanodgovor: "c"
     },
     {
-      question: "5+2. A Budapest-szelet (avagy Sertésszelet Budapest módra) elkészítéséhez melyik hozzávalóra nincs szükség?",
+      pitanje: "5+2. A Budapest-szelet (avagy Sertésszelet Budapest módra) elkészítéséhez melyik hozzávalóra nincs szükség?",
       opcije: {
         a: "bab",
         b: "gomba",
@@ -158,7 +186,7 @@
 
   sagradiKviz();
 
-  submitButton.addEventListener('click', prikaziRezultat);
+  prikaziRezultatButton.addEventListener('click', prikaziRezultat);
 })();
 </script>
 </body>
